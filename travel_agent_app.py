@@ -9,13 +9,19 @@ import streamlit as st
 import pandas as pd
 
 load_dotenv()
+api_key = os.environ.get("OPENROUTER_API_KEY")
+client = OpenAI(
+    api_key="OPENROUTER_API_KEY",
+    base_url="https://openrouter.ai/api/v1"
+)
 
 budget_agent = Agent(
     name="Budget Agent",
     model="gpt-4.1-mini",
     handoff_description="Specialist agent for Budget Planning",
     instructions="You are a budget planner, you will search the internet and provide the average event cost as well as daily cost for mentioned activities or dining in the given country, minimize the expense while ensuring the total cost of all activities is within the defined budget at all times, include flight cost and transport cost in the total budget planning.",
-    tools=[WebSearchTool()]
+    tools=[WebSearchTool()],
+    client=client
 )
 
 planner_agent = Agent(
@@ -23,7 +29,8 @@ planner_agent = Agent(
     model="gpt-4.1-mini",
     handoff_description="Specialist agent for activity scheduling",
     instructions="You are a trip planner, you will search the internet and provide the approximate duration spend for mentioned activities or dining in the given country, ensure that the total time spend is within the depicted number of days, ensure to allocate sufficient time for rest or unexpected changes.",
-    tools=[WebSearchTool()]
+    tools=[WebSearchTool()],
+    client=client
 )
 
 guide_agent = Agent(
@@ -31,7 +38,8 @@ guide_agent = Agent(
     model="gpt-4.1-mini",
     handoff_description="Specialist agent for identifying and providing the ratings for the most highly rated attractions or dining recommendations",
     instructions="You are a Guide Specialist, you will search the internet for the best rated tourist attraction activities or dining recommendations in the mentioned country.",
-    tools=[WebSearchTool()]
+    tools=[WebSearchTool()],
+    client=client
 )
 
 travel_agent = Agent(
@@ -158,4 +166,5 @@ if submit_button and loc_input and time_input and budget_input:
 if new_chat_button:
     st.write("Starting a new chat...")
     st.session_state.messages = []
+
     st.rerun()
