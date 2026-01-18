@@ -1,6 +1,7 @@
 ## Travel Agent Project
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from openai import AsyncOpenAI
 from agents.exceptions import InputGuardrailTripwireTriggered
 from agents import Agent, Runner, function_tool, WebSearchTool, handoff, RunContextWrapper, ItemHelpers, MessageOutputItem, Runner, trace, GuardrailFunctionOutput,TResponseInputItem, input_guardrail, InputGuardrailTripwireTriggered, SQLiteSession
 import requests
@@ -9,10 +10,9 @@ import streamlit as st
 import pandas as pd
 
 load_dotenv()
-api_key = os.environ.get("OPENROUTER_API_KEY")
-client = OpenAI(
-    api_key="OPENROUTER_API_KEY",
-    base_url="https://openrouter.ai/api/v1"
+client = AsyncOpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="OPENROUTER_API_KEY" 
 )
 
 budget_agent = Agent(
@@ -20,8 +20,7 @@ budget_agent = Agent(
     model="gpt-4.1-mini",
     handoff_description="Specialist agent for Budget Planning",
     instructions="You are a budget planner, you will search the internet and provide the average event cost as well as daily cost for mentioned activities or dining in the given country, minimize the expense while ensuring the total cost of all activities is within the defined budget at all times, include flight cost and transport cost in the total budget planning.",
-    tools=[WebSearchTool()],
-    client=client
+    tools=[WebSearchTool()]
 )
 
 planner_agent = Agent(
@@ -29,8 +28,7 @@ planner_agent = Agent(
     model="gpt-4.1-mini",
     handoff_description="Specialist agent for activity scheduling",
     instructions="You are a trip planner, you will search the internet and provide the approximate duration spend for mentioned activities or dining in the given country, ensure that the total time spend is within the depicted number of days, ensure to allocate sufficient time for rest or unexpected changes.",
-    tools=[WebSearchTool()],
-    client=client
+    tools=[WebSearchTool()]
 )
 
 guide_agent = Agent(
@@ -38,8 +36,7 @@ guide_agent = Agent(
     model="gpt-4.1-mini",
     handoff_description="Specialist agent for identifying and providing the ratings for the most highly rated attractions or dining recommendations",
     instructions="You are a Guide Specialist, you will search the internet for the best rated tourist attraction activities or dining recommendations in the mentioned country.",
-    tools=[WebSearchTool()],
-    client=client
+    tools=[WebSearchTool()]
 )
 
 travel_agent = Agent(
@@ -168,3 +165,4 @@ if new_chat_button:
     st.session_state.messages = []
 
     st.rerun()
+
