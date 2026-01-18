@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from openai import AsyncOpenAI
 from agents.exceptions import InputGuardrailTripwireTriggered
+from agents import set_default_openai_client
 from agents import Agent, Runner, function_tool, WebSearchTool, handoff, RunContextWrapper, ItemHelpers, MessageOutputItem, Runner, trace, GuardrailFunctionOutput,TResponseInputItem, input_guardrail, InputGuardrailTripwireTriggered, SQLiteSession
 import requests
 import asyncio
@@ -10,10 +11,11 @@ import streamlit as st
 import pandas as pd
 
 load_dotenv()
-client = AsyncOpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key="OPENROUTER_API_KEY" 
+custom_client = AsyncOpenAI(
+    base_url="https://openrouter.ai/api/v1", # Replace with your custom base URL
+    api_key="OPENROUTER_API_KEY" # Your API key
 )
+set_default_openai_client(custom_client)
 
 budget_agent = Agent(
     name="Budget Agent",
@@ -165,4 +167,5 @@ if new_chat_button:
     st.session_state.messages = []
 
     st.rerun()
+
 
